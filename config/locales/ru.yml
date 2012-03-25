@@ -48,7 +48,8 @@ ru:
 
     issue_update: "Обновить задачу"
     issue_update_description: "Обновить задачу: Гибко настраиваемая кнопка для изменения задачи"
-    issue_update_caption_label: " Название кнопки"
+    issue_update_caption_label: "Название кнопки"
+    issue_update_caption_value: "Обновить задачу"
     issue_update_conditions_subset: "Условия отображения"
     issue_update_actions_subset: "Действия"
     issue_update_set_issue_status_label: "Изменить статус задачи на"
@@ -80,4 +81,3 @@ ru:
     _issue_tracker_is_not_label: "Тип задачи НЕ"
     _project_label: "Проект"
     _project_is_not_label: "Проект НЕ"
-

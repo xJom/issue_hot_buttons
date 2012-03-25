@@ -48,7 +48,8 @@ zh:
 
     issue_update: "更新问题"
     issue_update_description: "用于更新问题的 Hot Button"
-    issue_update_caption_label: " 按钮标题"
+    issue_update_caption_label: "按钮标题"
+    issue_update_caption_value: "用于更新问题的"
     issue_update_conditions_subset: "条件"
     issue_update_actions_subset: "活动"
     issue_update_set_issue_status_label: "设置问题状态为"
@@ -80,4 +81,3 @@ zh:
     _issue_tracker_is_not_label: "问题跟踪类型排除"
     _project_label: "项目包含"
     _project_is_not_label: "项目排除"
-

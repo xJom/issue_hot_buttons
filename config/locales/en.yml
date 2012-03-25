@@ -48,7 +48,8 @@ en:
 
     issue_update: "Update issue"
     issue_update_description: "<strong>Update issue</strong>: Flexible Hot Button for update issue"
-    issue_update_caption_label: " Button title"
+    issue_update_caption_label: "Button title"
+    issue_update_caption_value: "Update issue"
     issue_update_conditions_subset: "Conditions"
     issue_update_actions_subset: "Actions"
     issue_update_set_issue_status_label: "Set issue status to"
@@ -80,4 +81,3 @@ en:
     _issue_tracker_is_not_label: "Issue tracker is NOT"
     _project_label: "Project is"
     _project_is_not_label: "Project is NOT"
-
