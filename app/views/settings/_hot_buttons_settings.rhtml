@@ -1,32 +1,33 @@
 <%
   issue_statuses = {}
-	IssueStatus.find(:all).each { |status| issue_statuses[status.id] = status.name }
+  IssueStatus.find(:all).each { |status| issue_statuses[status.id] = status.name }
 
-	issue_fields = {
-	  :issue_tracker_id => l(:field_tracker),
-	  :issue_subject => l(:field_subject),
-	  :issue_status_id => l(:field_status),
-	  :issue_priority_id => l(:field_priority),
-	  :issue_parent_issue_id => l(:field_parent_issue),
-	  :issue_start_date => l(:field_start_date),
-	  :issue_due_date => l(:field_due_date),
-	  :issue_estimated_hours => l(:field_estimated_hours),
-	  :issue_done_ratio => l(:field_done_ratio)
-	}
+  issue_fields = {
+    :issue_tracker_id => l(:field_tracker),
+    :issue_subject => l(:field_subject),
+    :issue_status_id => l(:field_status),
+    :issue_priority_id => l(:field_priority),
+    :issue_parent_issue_id => l(:field_parent_issue),
+    :issue_start_date => l(:field_start_date),
+    :issue_due_date => l(:field_due_date),
+    :issue_estimated_hours => l(:field_estimated_hours),
+    :issue_done_ratio => l(:field_done_ratio),
+    :issue_fixed_version_id => l(:field_fixed_version)
+  }
 
   issue_custom_fields = {}
   time_entry_custom_fields = {}
-	CustomField.find(:all).each { |field|
-	  if field[:type].eql? "IssueCustomField"
-	    issue_custom_fields[field.id] = field.name
-	  elsif field[:type].eql? "TimeEntryCustomField"
+  CustomField.find(:all).each { |field|
+    if field[:type].eql? "IssueCustomField"
+      issue_custom_fields[field.id] = field.name
+    elsif field[:type].eql? "TimeEntryCustomField"
       time_entry_custom_fields[field.id] = field.name
-	  end
-	}
-	
+    end
+  }
+  
   user_roles = {}
-	Role.find(:all).each { |role| user_roles[role.id] = role.name }
-	
+  Role.find(:all).each { |role| user_roles[role.id] = role.name }
+  
   i18n_strings = I18n.backend.send(:translations)
   locale = I18n.locale
 

@@ -187,7 +187,12 @@ document.observe('dom:loaded', function(){
         textarea.removeAttribute('style');
         textarea.writeAttribute('cols', 30);
         textarea.writeAttribute('rows', 5);
+      }
 
+      // Special magic for target version fields
+      var add_version = mirrored_element.select('.issue_fixed_version_id').first();
+      if (! Object.isUndefined(add_version)) {
+        var add_version_control = mirrored_element.select('a').first().remove();
       }
 
       /*Event.observe(mirrored_element.select('input,select').first(), 'change', function(event) {
