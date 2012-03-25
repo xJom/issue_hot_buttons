@@ -1,9 +1,9 @@
 require 'redmine'
 require 'dispatcher'
-require 'issues_controller_patch'
+require File.dirname(__FILE__) + '/lib/issues_controller_patch.rb'
 
 Dispatcher.to_prepare :issue_hot_buttons do
-  IssuesController.send(:include, IssuesControllerPatch)
+  IssuesController.send(:include, IssueHotButtons::IssuesControllerPatch)
 end
 
 class Hooks < Redmine::Hook::ViewListener

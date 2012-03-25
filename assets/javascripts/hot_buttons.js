@@ -1007,7 +1007,7 @@ document.observe('dom:loaded', function(){
     },
     
     is_workflow_suitable: function() {
-      if (Object.isUndefined(this.nearby_issues)) return false;
+      if (! this.nearby_issues) return false;
       if (this.nearby_issues.indexOf(this.issue.id) < 0) return false;
       switch (this.kind) {
         case 'next':
