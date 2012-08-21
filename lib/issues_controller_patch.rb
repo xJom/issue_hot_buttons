@@ -39,7 +39,7 @@ module IssueHotButtons
       end
 
       def store_last_seen_project
-        session[:last_seen_project] = @project.id
+        session[:last_seen_project] = @project.id unless @project.nil?
       end
     end
   end
