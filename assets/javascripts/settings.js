@@ -755,7 +755,7 @@ $(document).ready(function() {
    */
   //var Settings = Class.create(IssueHotButtonsSettings, {
   Settings = function() {
-	// this.initialize();
+	this.initialize();
   }
 
   $.extend(Settings.prototype, IssueHotButtonsSettings);
@@ -1113,4 +1113,5 @@ $(document).ready(function() {
 
   // Initialize settings page!
   var s = new Settings();
+  
 });
