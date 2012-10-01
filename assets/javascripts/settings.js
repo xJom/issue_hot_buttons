@@ -1107,5 +1107,5 @@ $(document).ready(function() {
   });
 
   // Initialize settings page!
-  new Settings();
+  var s = new Settings();
 });
