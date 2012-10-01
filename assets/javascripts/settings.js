@@ -2,14 +2,22 @@
  * Redmine Issue Hot Buttons plugin
  * Settings page
  */
-document.observe('dom:loaded', function() {
-
+//prototype:
+//document.observe('dom:loaded', function() {
+//jQuery:
+$(document).ready(function() {
   /**
    * Hot Buttons configuration factory.
    * Produce Hot Button settings sections
    */
-  var ButtonSettingsFactory = Class.create({
+    // no prototype
+    //var ButtonSettingsFactory = Class.create({
 
+    ButtonSettingsFactory = function() {
+  	//this.initialize();
+	}
+	
+	$.extend(ButtonSettingsFactory.prototype, {
     /**
      * "Next Issue" Hot Button fields frame
      *
@@ -709,7 +717,12 @@ document.observe('dom:loaded', function() {
   /**
    * Translator
    */
-  var Translator = Class.create({
+  // var Translator = Class.create({
+  Translator = function() {
+	//this.initialize();
+  }
+  
+  $.extend(Translator, {
     /**
      * Constructor.
      * Initialize translator
@@ -740,8 +753,14 @@ document.observe('dom:loaded', function() {
   /**
    * Settings page
    */
-  var Settings = Class.create(IssueHotButtonsSettings, {
+  //var Settings = Class.create(IssueHotButtonsSettings, {
+  Settings = function() {
+	// this.initialize();
+  }
 
+  $.extend(Settings.prototype, IssueHotButtonsSettings);
+
+  $.extend(Settings.prototype, {
     /**
      * Available Hot Buttons
      */
@@ -1093,5 +1112,5 @@ document.observe('dom:loaded', function() {
   });
 
   // Initialize settings page!
-  new Settings();
+  var s = new Settings();
 });
