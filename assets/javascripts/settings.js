@@ -14,7 +14,7 @@ $(document).ready(function() {
     //var ButtonSettingsFactory = Class.create({
 
     ButtonSettingsFactory = function() {
-		this.initialize();
+		//this.initialize();
 	}
 	
 	$.extend(ButtonSettingsFactory.prototype, {
@@ -719,7 +719,7 @@ $(document).ready(function() {
    */
   // var Translator = Class.create({
   Translator = function() {
-	this.initialize();
+	//this.initialize();
   }
   
   $.extend(Translator, {
@@ -754,8 +754,13 @@ $(document).ready(function() {
    * Settings page
    */
   //var Settings = Class.create(IssueHotButtonsSettings, {
-  Settings = $.extend(IssueHotButtonsSettings, {
+  Settings = function() {
+	// this.initialize();
+  }
 
+  $.extend(Settings.prototype, IssueHotButtonsSettings);
+
+  $.extend(Settings.prototype, {
     /**
      * Available Hot Buttons
      */
