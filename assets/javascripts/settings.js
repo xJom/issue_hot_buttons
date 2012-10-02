@@ -14,7 +14,7 @@ $(document).ready(function() {
     //var ButtonSettingsFactory = Class.create({
 
     ButtonSettingsFactory = function() {
-		//this.initialize();
+	this.initialize();
 	}
 	
 	$.extend(ButtonSettingsFactory.prototype, {
@@ -469,7 +469,7 @@ $(document).ready(function() {
         button_name,
         button_frame,
         new Element('div',{'class': 'fields'}),
-        new Hash(params));
+        new Hashtable(params));
     },
 
     /**
@@ -485,7 +485,7 @@ $(document).ready(function() {
     render_group: function(button_name, inputs_group, wrap_element, params) {
       var t = this;
 
-      inputs_group = new Hash(inputs_group);
+      inputs_group = new Hashtable(inputs_group);
 
       var optional_fields = inputs_group.get('_optional') || [];
       var callback = inputs_group.get('_callback') || {};
@@ -520,7 +520,7 @@ $(document).ready(function() {
           input_value = params.get(input_name) || input_value;
           var default_value = input_options.shift();
           // special input params like "_optional"
-          var service_params = new Hash();
+          var service_params = new Hashtable();
           if (optional_fields.indexOf(input_name) != -1) {
             service_params.set('_optional', true);
           }
@@ -592,7 +592,7 @@ $(document).ready(function() {
 
           if (multiselect) {
             select.setAttribute('multiple', 'multiple');
-            new Hash(default_value).each(function(pair){
+            new Hashtable(default_value).each(function(pair){
               var option_element = new Element('option', {
                 value: pair.key,
                 name: false
@@ -605,7 +605,7 @@ $(document).ready(function() {
             });
           }
           else {
-            new Hash(default_value).each(function(pair){
+            new Hashtable(default_value).each(function(pair){
                 select.insert(
                   new Element('option', {value: pair.key,name: false})
                     .insert(pair.value)
@@ -665,7 +665,7 @@ $(document).ready(function() {
       input_element = Object.isArray(input_element) ? input_element : [input_element];
       input_element.each(function(element){
         if (callback && 'hidden' !== element.type) {
-          callback = new Hash(callback);
+          callback = new Hashtable(callback);
           callback.each(function(pair){
             var event_name = pair.key;
             var event_callback = pair.value;
@@ -718,11 +718,11 @@ $(document).ready(function() {
    * Translator
    */
   // var Translator = Class.create({
-  Translator = function() {
-	//this.initialize();
+  Translator = function(i18n_strings) {
+    this.initialize(i18n_strings);
   }
   
-  $.extend(Translator, {
+  $.extend(Translator.prototype, {
     /**
      * Constructor.
      * Initialize translator
@@ -732,7 +732,7 @@ $(document).ready(function() {
      * @return void
      */
     initialize: function(i18n_strings) {
-      this.i18n_strings = new Hash(i18n_strings);
+      this.i18n_strings = new Hashtable(i18n_strings);
     },
 
     /**
@@ -755,7 +755,7 @@ $(document).ready(function() {
    */
   //var Settings = Class.create(IssueHotButtonsSettings, {
   Settings = function() {
-	// this.initialize();
+      this.initialize();
   }
 
   $.extend(Settings.prototype, IssueHotButtonsSettings);
@@ -813,8 +813,8 @@ $(document).ready(function() {
       }
 
       var t = this;
-      new Hash(this.settings).values().each(function(button_config){
-        var button_config = new Hash(button_config);
+      new Hashtable(this.settings).values().each(function(button_config){
+        var button_config = new Hashtable(button_config);
         var name = button_config.keys().first();
         var params = button_config.values().first();
 
