@@ -6,15 +6,18 @@
 //document.observe('dom:loaded', function() {
 //jQuery:
 
-function ObjectIsArray(what) {
-   return Object.prototype.toString.call(what) === '[object Array]';
-}
 
 function ObjectIsUndefined(what) {
     if (typeof what === 'undefined')
         return true;
     else
         return false;
+}
+
+Array.prototype.foreach = function(callback) {
+    for (var k=0; k < this.length; k++) {
+	callback(k, this[k] );
+    }
 }
 
 $(document).ready(function() {
@@ -29,7 +32,7 @@ $(document).ready(function() {
 	this.initialize();
 	}
 	
-	$.extend(ButtonSettingsFactory.prototype, {
+    $.extend(ButtonSettingsFactory.prototype, {
     /**
      * "Next Issue" Hot Button fields frame
      *
@@ -75,7 +78,7 @@ $(document).ready(function() {
      */
     button_time_tracker: function() {
       var t = this;
-      var users_roles = Object.clone(this.user_roles);
+      var users_roles = (new HashTable(this.user_roles)).items;
       users_roles['current_user'] = '&lt;&lt; ' + this._('current_user') + ' &gt;&gt;';
       users_roles['nobody'] = '&lt;&lt; ' + this._('nobody') + ' &gt;&gt;';
       var check_not_empty = {
@@ -126,7 +129,7 @@ $(document).ready(function() {
      * @return "Reassign to" Hot Button settings frame
      */
     button_issue_update: function() {
-      var users_roles = Object.clone(this.user_roles);
+      var users_roles = (new HashTable(this.user_roles)).items;
       users_roles['current_user'] = '&lt;&lt; ' + this._('current_user') + ' &gt;&gt;';
       users_roles['nobody'] = '&lt;&lt; ' + this._('nobody') + ' &gt;&gt;';
       
@@ -171,7 +174,7 @@ $(document).ready(function() {
      * @return Conditions subset
      */
     get_conditions: function() {
-      var users_roles = Object.clone(this.user_roles);
+      var users_roles = (new HashTable(this.user_roles)).items;
       users_roles['current_user'] = '&lt;&lt; ' + this._('current_user') + ' &gt;&gt;';
       users_roles['nobody'] = '&lt;&lt; ' + this._('nobody') + ' &gt;&gt;';
       var t = this;
@@ -318,7 +321,7 @@ $(document).ready(function() {
      * @return Hot Button settings section
      */
     get: function(button_name, params) {
-      if (Object.isFunction(this['button_' + button_name])) {
+      if ($.isFunction(this['button_' + button_name])) {
         var button_frame = this['button_' + button_name](params);
 
 
@@ -348,20 +351,20 @@ $(document).ready(function() {
     wrap_button: function(button_name, button, config_section_name) {
       var t = this;
 
-      var delete_button = $('<a />', {
+      var delete_button = $('<a>', {
         'class': 'icon-del icon',
         href: 'javascript:void(0)',
-      }).appendTo(this._('delete'));
+      }).html(this._('delete'));
 
       delete_button.on('click', function(event){
         Event.element(event).up(1).remove();
       })
 
-      var config_section_title = $('<a />',{
+      var config_section_title = $('<a>',{
         'class': 'collapse_section internal_name',
         href: 'javascript:void(0)'
       })
-      .update(config_section_name);
+      .wrapInner(config_section_name);
 
       config_section_title.on('click', function(event){
         var config_section = Event.element(event).up('.hot_button');
@@ -393,19 +396,19 @@ $(document).ready(function() {
         name_link.show();
 
         var internal_name_value = name_input.value.strip();
-        name_link.update(internal_name_value);
+        name_link.wrapInner(internal_name_value);
 
         button_save.up(1).select('input[xname="internal_name"]')
           .first()
           .value = internal_name_value;
       };
       
-      Event.observe(internal_name_input, 'blur', save_internal_name_callback);
+      internal_name_input.on('blur', save_internal_name_callback);
       
-      var edit_internal_name = $('<a />', {
+      var edit_internal_name = $('<a>', {
         'class': 'icon-edit icon edit_internal_name',
         href: 'javascript:void(0)'
-      }).append(this._('rename'));
+      }).text(this._('rename'));
       
       var edit_internal_name_callback = function(event){
         var button_edit = Event.element(event);
@@ -424,22 +427,22 @@ $(document).ready(function() {
         name_link.hide();
       };
       
-      Event.observe(edit_internal_name, 'click', edit_internal_name_callback);
+      edit_internal_name.on('click', edit_internal_name_callback);
       edit_internal_name.click = edit_internal_name_callback;
 
-      var save_internal_name = $('<a />', {
+      var save_internal_name = $('<a>', {
         'class': 'icon-save icon save_internal_name',
         href: 'javascript:void(0)'
       })
-        .append(this._('save'))
+        .text(this._('save'))
         .hide();
 
       save_internal_name.on('click', save_internal_name_callback);
       
-      var clone_hot_button = $('<a />', {
+      var clone_hot_button = $('<a>', {
         'class': 'icon-copy icon clone_hot_button',
         href: 'javascript:void(0)'
-      }).append(this._('clone'));
+      }).text(this._('clone'));
       
       var elements = [
         $('<p>', {'class': 'title'})
@@ -451,12 +454,12 @@ $(document).ready(function() {
           .insert(delete_button),
 
          $('<p>', {'class': 'description'})
-          .append(this._([button_name, 'description'])),
+          .text(this._([button_name, 'description'])),
 
         button
       ];
 
-      var wrapper = $('<li />')
+      var wrapper = $('<li>')
         .addClassName('hot_button')
         .addClassName(button_name);
 
@@ -499,18 +502,15 @@ $(document).ready(function() {
 
       inputs_group = new HashTable(inputs_group);
 
-      var optional_fields = inputs_group.get('_optional') || [];
-      var callback = inputs_group.get('_callback') || {};
-      var shared_names = inputs_group.get('_shared_names') || false;
+      var optional_fields = inputs_group['_optional'] || [];
+      var callback = inputs_group['_callback'] || {};
+      var shared_names = inputs_group['_shared_names'] || false;
 
-      for (pair in inputs_group) {
+      inputs_group.each(function(input_name,input_options) {
         // ignore service keys that starts with underscore, like "_optional"
-        if (! pair.key.indexOf('_')) return false;
+        if (! input_name.indexOf('_')) return false;
 
-        var input_name    = pair.key;
-        var input_options = pair.value;
-
-        if (! Object.isString(input_options) && ! ObjectIsArray(input_options)) {
+        if (! typeof(input_options) == 'string' && ! $.isArray(input_options)) {
           var sub_wrapper = $('<fieldset />', {
             'class': 'subset'
           });
@@ -526,18 +526,18 @@ $(document).ready(function() {
           wrap_element.insert(sub_wrapper);
         }
         else {
-          if (! ObjectIsArray(input_options)) input_options = [input_options];
+          if (! $.isArray(input_options)) input_options = [input_options];
           var input_type  = input_options.shift();
           var input_value = input_options.shift();
-          input_value = params.get(input_name) || input_value;
+          input_value = params[input_name] || input_value;
           var default_value = input_options.shift();
           // special input params like "_optional"
           var service_params = new HashTable();
           if (optional_fields.indexOf(input_name) != -1) {
-            service_params.set('_optional', true);
+            service_params['_optional'] = true;
           }
           if (callback[input_name]) {
-            service_params.set('_callback', callback[input_name]);
+            service_params['_callback'] = callback[input_name];
           }
 
           wrap_element.insert(
@@ -552,7 +552,7 @@ $(document).ready(function() {
           );
 
         }
-      };
+      });
       
       return wrap_element;
     },
@@ -598,19 +598,19 @@ $(document).ready(function() {
           input_value = input_value.toString();
           input_value = input_value.isJSON() ? input_value.evalJSON() : input_value;
           
-          var select = $('<select />', {'class': input_name})
+          var select = $('<select>', {'class': input_name})
             .addClassName(isOptional ? 'optional' : '')
             .addClassName(input_value.length ? '' : 'no_value');
 
           if (multiselect) {
             select.setAttribute('multiple', 'multiple');
             for (pair in new HashTable(default_value)) {
-              var option_element = $('<option />', {
+              var option_element = $('<option>', {
                 value: pair.key,
                 name: false
               }).append(pair.value);
               
-              if (ObjectIsArray(input_value) && input_value.indexOf(pair.key) !== -1) {
+              if ($.isArray(input_value) && input_value.indexOf(pair.key) !== -1) {
                 option_element.setAttribute('selected', 'selected')
               }
               select.insert(option_element);
@@ -619,16 +619,16 @@ $(document).ready(function() {
           else {
             for (pair in new HashTable(default_value)) {
                 select.append(
-                  $('<option />', {value: pair.key,name: false})
+                  $('<option>', {value: pair.key,name: false})
                     .append(pair.value)
               );
             };
-            select.value = ObjectIsArray(input_value) ? input_value.pop() : input_value;
+            select.value = $.isArray(input_value) ? input_value.pop() : input_value;
           }
           
           input_element =  [
             select,
-            $('<input />', {xname: input_name, type: 'hidden'})
+            $('<input>', {xname: input_name, type: 'hidden'})
           ];
           
           break;
@@ -674,7 +674,7 @@ $(document).ready(function() {
       var result = $('div', {'class': 'input_wrapper'})
         .append(no_label || new Element('label').insert(this._([button_name, input_name, 'label'])));
 
-      input_element = ObjectIsArray(input_element) ? input_element : [input_element];
+      input_element = $.isArray(input_element) ? input_element : [input_element];
       for (element in input_element) {
         if (callback && 'hidden' !== element.type) {
           callback = new HashTable(callback);
@@ -730,8 +730,8 @@ $(document).ready(function() {
    * Translator
    */
   // var Translator = Class.create({
-  Translator = function(i18n_strings) {
-    this.initialize(i18n_strings);
+  Translator = function() {
+    this.initialize();
   }
   
   $.extend(Translator.prototype, {
@@ -743,8 +743,8 @@ $(document).ready(function() {
      *
      * @return void
      */
-    initialize: function(i18n_strings) {
-      this.i18n_strings = new HashTable(i18n_strings);
+    initialize: function() {
+      this.i18n_strings = new HashTable(IssueHotButtonsSettings.i18n_strings);
     },
 
     /**
@@ -757,8 +757,8 @@ $(document).ready(function() {
      */
     get: function(key, get_back) {
       get_back = get_back === false ? false : true;
-      if (ObjectIsArray(key)) key = key.join('_');
-      return this.i18n_strings.get(key) || (get_back ? key : false);
+      if ($.isArray(key)) key = key.join('_');
+      return this.i18n_strings[key] || (get_back ? key : false);
     }
   });
 
@@ -792,7 +792,7 @@ $(document).ready(function() {
     initialize: function() {
       this.buttons_factory = new ButtonSettingsFactory();
 
-      this.translator = this.buttons_factory.translator = new Translator(this.i18n_strings);
+      this.translator = this.buttons_factory.translator = new Translator();
 
       // Assign custom fields to ButtonSettingsFactory
       this.buttons_factory.issue_custom_fields = this.issue_custom_fields;
@@ -825,6 +825,7 @@ $(document).ready(function() {
       }
 
       var t = this;
+/*
       for (button_config in new HashTable(this.settings).values()) {
         var button_config = new HashTable(button_config);
         var name = button_config.keys().first();
@@ -834,6 +835,13 @@ $(document).ready(function() {
         $('#buttons_list').append(button);
         t.hide_optional_fields(button);
       };
+*/
+    var ht = new HashTable(this.settings);
+    ht.each( function(name, button_config) {
+        var button = t.render_button(name, button_config, true);
+        $('#buttons_list').append(button);
+        t.hide_optional_fields(button);
+      });
       this.init_sortable_list();
     },
 
@@ -858,7 +866,8 @@ $(document).ready(function() {
      */
     attach_input_names: function() {
       var button_number = 0;
-      $$('li.hot_button').each(function(li){
+      //$$('li.hot_button').each(function(li){
+      for (li in $('#li.hot_button')) {
         var collapsed = li.hasClassName('collapsed');
         if (collapsed) {
           li.removeClassName('collapsed');
@@ -894,7 +903,7 @@ $(document).ready(function() {
           li.addClassName('collapsed');
         }
         button_number++;
-      });
+      };
     },
 
     /**
@@ -905,38 +914,38 @@ $(document).ready(function() {
     render_selector: function() {
       var t = this;
 
-      var wrapper = $('<div></div>', {id: 'hot_buttons_selector_wrapper'});
+      var wrapper = $('<div>', {id: 'hot_buttons_selector_wrapper'});
 
-      var label = $('<label></label>', {'for': 'hot_buttons_selector'});
+      var label = $('<label>', {'for': 'hot_buttons_selector'});
 //        .appendTo(this._('select_hot_button'));
       wrapper.append(label);
 
-      var select = $('<select />', {id: 'hot_buttons_selector'});
+      var select = $('<select>', {id: 'hot_buttons_selector'});
       var buttons = this.available_buttons;
-      buttons.unshift(false);
-      // buttons.each(function(button_id){
-      for (button_id in buttons)
-      {
-        select.append($('<option />', { value: button_id }));
-      }
+      buttons.unshift("");
+      buttons.foreach(function(button_id,button_val) {
+        select.append($('<option>', { value: button_val }).text(t._(button_val)));
+      });
       wrapper.append(select);
 
-      var collapse_button = $('<a />',{
+      var collapse_button = $('<a>',{
         'href': 'javascript:void(0)',
         'class': 'icon icon-folder'
       })
-        //.update('collapse_all')
+        .text(this._('collapse_all'))
         .on('click', function(){
-          $$('#buttons_list li.hot_button').each(function(hot_button){
+          $('#buttons_list li.hot_button').foreach(function(id,hot_button){
+          // for (hot_button in $('#buttons_list li.hot_button')) {
             hot_button.hasClassName('collapsed')
               ? false
               : hot_button.addClassName('collapsed');
           });
         });
-      var expand_button = $('<a />',{
+      var expand_button = $('<a>',{
         'href': 'javascript:void(0)',
         'class': 'icon open icon-folder'
       })
+      .text('expand_all')
         //.update('expand_all')
         .on('click', function(){
           $$('#buttons_list li.hot_button').each(function(hot_button){
@@ -950,13 +959,14 @@ $(document).ready(function() {
       wrapper.append(collapse_controls);
 
       select.on('change', function(){
-        var button_name = $('hot_buttons_selector').value;
+        var button_name = $('#hot_buttons_selector').val();
         if (button_name.length == 0) return false;
 
-        $$('#hot_buttons_selector option').first().selected = true;
+	// $$ ???
+        $('#hot_buttons_selector option').first().selected = true;
 
         var button = t.render_button(button_name, false, false, 'top');
-        $('buttons_list').insert({'top': button});
+        $('#buttons_list').prepend(button);
         t.hide_optional_fields(button);
         var edit_name = button.select('.edit_internal_name').first();
         edit_name.click(edit_name.fire('click'));
@@ -1101,7 +1111,7 @@ $(document).ready(function() {
         optional_fields_select = field_container.select('select.optional_fields').first();
       }
       optional_fields_select.append(
-        $('<option />', {value: element_name}).update(label_text)
+        $('<option></option>', {value: element_name}).update(label_text)
       );
       optional_fields_select.up().show();  
 
@@ -1118,8 +1128,8 @@ $(document).ready(function() {
      * @return Translated string for current language
      */
     _: function(key, get_back) {
-      return key;
-      //return this.translator.get(key, get_back);
+      //return key;
+      return this.translator.get(key, get_back);
     }
   });
 
