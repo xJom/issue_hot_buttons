@@ -2,37 +2,15 @@
  * Redmine Issue Hot Buttons plugin
  * Settings page
  */
-//prototype:
-//document.observe('dom:loaded', function() {
-//jQuery:
 
+jQuery(document).ready(function() {
 
-function ObjectIsUndefined(what) {
-    if (typeof what === 'undefined')
-        return true;
-    else
-        return false;
-}
-
-Array.prototype.foreach = function(callback) {
-    for (var k=0; k < this.length; k++) {
-	callback(k, this[k] );
-    }
-}
-
-$(document).ready(function() {
   /**
    * Hot Buttons configuration factory.
    * Produce Hot Button settings sections
    */
-    // no prototype
-    //var ButtonSettingsFactory = Class.create({
+  var ButtonSettingsFactory = Class.create({
 
-    ButtonSettingsFactory = function() {
-	this.initialize();
-	}
-	
-    $.extend(ButtonSettingsFactory.prototype, {
     /**
      * "Next Issue" Hot Button fields frame
      *
@@ -78,7 +56,7 @@ $(document).ready(function() {
      */
     button_time_tracker: function() {
       var t = this;
-      var users_roles = (new HashTable(this.user_roles)).items;
+      var users_roles = Object.clone(this.user_roles);
       users_roles['current_user'] = '&lt;&lt; ' + this._('current_user') + ' &gt;&gt;';
       users_roles['nobody'] = '&lt;&lt; ' + this._('nobody') + ' &gt;&gt;';
       var check_not_empty = {
@@ -129,7 +107,7 @@ $(document).ready(function() {
      * @return "Reassign to" Hot Button settings frame
      */
     button_issue_update: function() {
-      var users_roles = (new HashTable(this.user_roles)).items;
+      var users_roles = Object.clone(this.user_roles);
       users_roles['current_user'] = '&lt;&lt; ' + this._('current_user') + ' &gt;&gt;';
       users_roles['nobody'] = '&lt;&lt; ' + this._('nobody') + ' &gt;&gt;';
       
@@ -174,7 +152,7 @@ $(document).ready(function() {
      * @return Conditions subset
      */
     get_conditions: function() {
-      var users_roles = (new HashTable(this.user_roles)).items;
+      var users_roles = Object.clone(this.user_roles);
       users_roles['current_user'] = '&lt;&lt; ' + this._('current_user') + ' &gt;&gt;';
       users_roles['nobody'] = '&lt;&lt; ' + this._('nobody') + ' &gt;&gt;';
       var t = this;
@@ -241,9 +219,9 @@ $(document).ready(function() {
       assign_to_other_change: function(e) {
         var select = e.element();
         var multiple = true;
-        for (option in select.select('option:selected')) {
+        select.select('option:selected').each(function(option){
           multiple = multiple && -1 === ['current_user', 'nobody'].indexOf(option.value)
-        };
+        });
         
         if (multiple) {
           select.writeAttribute('multiple', 'multiple');
@@ -274,13 +252,13 @@ $(document).ready(function() {
         var element = e.element();
         var pair = element.up(1).select('.' + pair).first();
         if (pair) {
-          for (option in element.select('option:selected')) {
+          element.select('option:selected').each(function(option){
             var pair_option =
               pair.select('option:selected[value="' + option.value + '"]').first();
             if (pair_option) {
               pair_option.selected = false;
             }
-          };
+          });
         }
       },
       
@@ -321,12 +299,12 @@ $(document).ready(function() {
      * @return Hot Button settings section
      */
     get: function(button_name, params) {
-      if ($.isFunction(this['button_' + button_name])) {
+      if (Object.isFunction(this['button_' + button_name])) {
         var button_frame = this['button_' + button_name](params);
 
 
-        var config_section_name = !ObjectIsUndefined(params) &&
-          ! ObjectIsUndefined(params.internal_name) &&
+        var config_section_name = !Object.isUndefined(params) &&
+          ! Object.isUndefined(params.internal_name) &&
           params['internal_name'].strip();
 
         return this.wrap_button(
@@ -351,32 +329,32 @@ $(document).ready(function() {
     wrap_button: function(button_name, button, config_section_name) {
       var t = this;
 
-      var delete_button = $('<a>', {
+      var delete_button = new Element('a', {
         'class': 'icon-del icon',
-        href: 'javascript:void(0)',
-      }).html(this._('delete'));
+        href: 'javascript:void(0)'
+      }).insert(this._('delete'));
 
-      delete_button.on('click', function(event){
+      Event.observe(delete_button, 'click', function(event){
         Event.element(event).up(1).remove();
       })
 
-      var config_section_title = $('<a>',{
+      var config_section_title = new Element('a',{
         'class': 'collapse_section internal_name',
         href: 'javascript:void(0)'
       })
-      .text(config_section_name);
+        .update(config_section_name);
 
-      config_section_title.on('click', function(event){
+      Event.observe(config_section_title, 'click', function(event){
         var config_section = Event.element(event).up('.hot_button');
         if (config_section.hasClassName('collapsed')) {
-          config_section.removeClass('collapsed');
+          config_section.removeClassName('collapsed');
         }
         else {
-          config_section.addClass('collapsed');
+          config_section.addClassName('collapsed');
         }
       })
 
-      var internal_name_input = $('<input>', {
+      var internal_name_input = new Element('input', {
         type: 'text',
         'class': 'internal_name',
         value: config_section_name
@@ -396,19 +374,19 @@ $(document).ready(function() {
         name_link.show();
 
         var internal_name_value = name_input.value.strip();
-        name_link.wrapInner(internal_name_value);
+        name_link.update(internal_name_value);
 
         button_save.up(1).select('input[xname="internal_name"]')
           .first()
           .value = internal_name_value;
       };
       
-      internal_name_input.on('blur', save_internal_name_callback);
+      Event.observe(internal_name_input, 'blur', save_internal_name_callback);
       
-      var edit_internal_name = $('<a>', {
+      var edit_internal_name = new Element('a', {
         'class': 'icon-edit icon edit_internal_name',
         href: 'javascript:void(0)'
-      }).text(this._('rename'));
+      }).insert(this._('rename'));
       
       var edit_internal_name_callback = function(event){
         var button_edit = Event.element(event);
@@ -427,45 +405,45 @@ $(document).ready(function() {
         name_link.hide();
       };
       
-      edit_internal_name.on('click', edit_internal_name_callback);
+      Event.observe(edit_internal_name, 'click', edit_internal_name_callback);
       edit_internal_name.click = edit_internal_name_callback;
 
-      var save_internal_name = $('<a>', {
+      var save_internal_name = new Element('a', {
         'class': 'icon-save icon save_internal_name',
         href: 'javascript:void(0)'
       })
-        .text(this._('save'))
+        .insert(this._('save'))
         .hide();
 
-      save_internal_name.on('click', save_internal_name_callback);
+      Event.observe(save_internal_name, 'click', save_internal_name_callback);
       
-      var clone_hot_button = $('<a>', {
+      var clone_hot_button = new Element('a', {
         'class': 'icon-copy icon clone_hot_button',
         href: 'javascript:void(0)'
-      }).text(this._('clone'));
+      }).insert(this._('clone'));
       
       var elements = [
-        $('<p>', {'class': 'title'})
-          .append(config_section_title)
-          .append(internal_name_input)
-          .append(save_internal_name)
-          .append(edit_internal_name)
-          .append(clone_hot_button)
-          .append(delete_button),
+        new Element('p', {'class': 'title'})
+          .insert(config_section_title)
+          .insert(internal_name_input)
+          .insert(save_internal_name)
+          .insert(edit_internal_name)
+          .insert(clone_hot_button)
+          .insert(delete_button),
 
-         $('<p>', {'class': 'description'})
-          .text(this._([button_name, 'description'])),
+        new Element('p', {'class': 'description'})
+          .insert(this._([button_name, 'description'])),
 
         button
       ];
 
-      var wrapper = $('<li>')
-        .addClass('hot_button')
-        .addClass(button_name);
+      var wrapper = new Element('li')
+        .addClassName('hot_button')
+        .addClassName(button_name);
 
-      for (item in elements) {
-        wrapper.append(elements[item]);
-      };
+      elements.each(function(item) {
+        wrapper.insert(item);
+      });
 
       return wrapper;
     },
@@ -483,8 +461,8 @@ $(document).ready(function() {
       return this.render_group(
         button_name,
         button_frame,
-        $('<div>',{'class': 'fields'}),
-        new HashTable(params));
+        new Element('div',{'class': 'fields'}),
+        new Hash(params));
     },
 
     /**
@@ -500,47 +478,50 @@ $(document).ready(function() {
     render_group: function(button_name, inputs_group, wrap_element, params) {
       var t = this;
 
-      inputs_group = new HashTable(inputs_group);
+      inputs_group = new Hash(inputs_group);
 
-      var optional_fields = inputs_group['_optional'] || [];
-      var callback = inputs_group['_callback'] || {};
-      var shared_names = inputs_group['_shared_names'] || false;
+      var optional_fields = inputs_group.get('_optional') || [];
+      var callback = inputs_group.get('_callback') || {};
+      var shared_names = inputs_group.get('_shared_names') || false;
 
-      inputs_group.each(function(input_name,input_options) {
+      inputs_group.each(function(pair){
         // ignore service keys that starts with underscore, like "_optional"
-        if (! input_name.indexOf('_')) return false;
+        if (! pair.key.indexOf('_')) return false;
 
-        if (! typeof(input_options) == 'string' && ! $.isArray(input_options)) {
-          var sub_wrapper = $('<fieldset />', {
+        var input_name    = pair.key;
+        var input_options = pair.value;
+
+        if (! Object.isString(input_options) && ! Object.isArray(input_options)) {
+          var sub_wrapper = new Element('fieldset', {
             'class': 'subset'
           });
 
           var legend = false;
           if (legend = t._([button_name, input_name, 'subset'], false)) {
-            sub_wrapper.append(
-              $('<legend />').append(legend)
+            sub_wrapper.insert(
+              new Element('legend').insert(legend)
             );
           }
 
           t.render_group(button_name, input_options, sub_wrapper, params);
-          wrap_element.append(sub_wrapper);
+          wrap_element.insert(sub_wrapper);
         }
         else {
-          if (! $.isArray(input_options)) input_options = [input_options];
+          if (! Object.isArray(input_options)) input_options = [input_options];
           var input_type  = input_options.shift();
           var input_value = input_options.shift();
-          input_value = params[input_name] || input_value;
+          input_value = params.get(input_name) || input_value;
           var default_value = input_options.shift();
           // special input params like "_optional"
-          var service_params = new HashTable();
+          var service_params = new Hash();
           if (optional_fields.indexOf(input_name) != -1) {
-            service_params['_optional'] = true;
+            service_params.set('_optional', true);
           }
           if (callback[input_name]) {
-            service_params['_callback'] = callback[input_name];
+            service_params.set('_callback', callback[input_name]);
           }
 
-          wrap_element.append(
+          wrap_element.insert(
             t.render_input(
               shared_names ? '' : button_name,
               input_type,
@@ -578,12 +559,12 @@ $(document).ready(function() {
       var input_element = null;
       var no_label = false;
 
-      var isOptional = service_params['_optional'];
-      var callback  = service_params['_callback'];
+      var isOptional = service_params.get('_optional');
+      var callback  = service_params.get('_callback');
       
       switch (input_type) {
         case 'hidden':
-          input_element = $('<input>', {
+          input_element = new Element('input', {
             xname: input_name,
             type:  'hidden',
             value: input_value
@@ -598,57 +579,57 @@ $(document).ready(function() {
           input_value = input_value.toString();
           input_value = input_value.isJSON() ? input_value.evalJSON() : input_value;
           
-          var select = $('<select>', {'class': input_name})
-            .addClass(isOptional ? 'optional' : '')
-            .addClass(input_value.length ? '' : 'no_value');
+          var select = new Element('select', {'class': input_name})
+            .addClassName(isOptional ? 'optional' : '')
+            .addClassName(input_value.length ? '' : 'no_value');
 
           if (multiselect) {
             select.setAttribute('multiple', 'multiple');
-            for (pair in new HashTable(default_value)) {
-              var option_element = $('<option>', {
+            new Hash(default_value).each(function(pair){
+              var option_element = new Element('option', {
                 value: pair.key,
                 name: false
-              }).append(pair.value);
+              }).insert(pair.value);
               
-              if ($.isArray(input_value) && input_value.indexOf(pair.key) !== -1) {
+              if (Object.isArray(input_value) && input_value.indexOf(pair.key) !== -1) {
                 option_element.setAttribute('selected', 'selected')
               }
-              select.append(option_element);
-            };
+              select.insert(option_element);
+            });
           }
           else {
-            for (pair in new HashTable(default_value)) {
-                select.append(
-                  $('<option>', {value: pair.key,name: false})
-                    .append(pair.value)
+            new Hash(default_value).each(function(pair){
+                select.insert(
+                  new Element('option', {value: pair.key,name: false})
+                    .insert(pair.value)
               );
-            };
-            select.value = $.isArray(input_value) ? input_value.pop() : input_value;
+            });
+            select.value = Object.isArray(input_value) ? input_value.pop() : input_value;
           }
           
           input_element =  [
             select,
-            $('<input>', {xname: input_name, type: 'hidden'})
+            new Element('input', {xname: input_name, type: 'hidden'})
           ];
           
           break;
 
         case 'flag':
-          var is_undefined = ObjectIsUndefined(input_value);
+          var is_undefined = Object.isUndefined(input_value);
           input_element = [
-            $('<input>', {
+            new Element('input', {
               xname: input_name,
               type: 'hidden',
               value: 0
             }),
-            $('<input>', {
+            new Element('input', {
               xname: input_name,
               'class': input_name,
               type: 'checkbox',
               value: 1
             })
-              .addClass(isOptional ? 'optional' : '')
-              .addClass(parseInt(input_value) ? '' : 'no_value')
+              .addClassName(isOptional ? 'optional' : '')
+              .addClassName(parseInt(input_value) ? '' : 'no_value')
           ];
           
           if ((is_undefined && default_value) || (!is_undefined && parseInt(input_value) !== 0)) {
@@ -658,55 +639,56 @@ $(document).ready(function() {
 
         default:
         case 'text':
-          var is_no_value = ObjectIsUndefined(input_value) || ! input_value;
+          var is_no_value = Object.isUndefined(input_value) || ! input_value;
 
           input_value = input_value || default_value || (this._([button_name, input_name, 'value'], false) || input_value);
-          input_element = $('<input />', {
+          input_element = new Element('input', {
             xname: input_name,
             'class': input_name,
             type: 'text',
             value: input_value || ''
           })
-            .addClass(isOptional ? 'optional' : '')
-            .addClass(is_no_value ? 'no_value' : '');
+            .addClassName(isOptional ? 'optional' : '')
+            .addClassName(is_no_value ? 'no_value' : '');
       }
 
-      var result = $('<div>', {'class': 'input_wrapper'})
-        .append(no_label || $('<label>').append(this._([button_name, input_name, 'label'])));
+      var result = new Element('div', {'class': 'input_wrapper'})
+        .insert(no_label || new Element('label').insert(this._([button_name, input_name, 'label'])));
 
-      input_element = $.isArray(input_element) ? input_element : [input_element];
-      for (element in input_element) {
-	    var element_val = input_element[element];
-        if (callback && 'hidden' !== element_val.type) {
-          callback = new HashTable(callback);
-          for (pair in callback) {
+      input_element = Object.isArray(input_element) ? input_element : [input_element];
+      input_element.each(function(element){
+        if (callback && 'hidden' !== element.type) {
+          callback = new Hash(callback);
+          callback.each(function(pair){
             var event_name = pair.key;
             var event_callback = pair.value;
-            element_val.on(event_name, event_callback);
+            element.observe(event_name, event_callback);
             if ('element:loaded' == event_name) {
-              Event.fire(element_val, 'element:loaded');
+              Event.fire(element, 'element:loaded');
             }
-          };
+          });
         }
-        result.append(element_val);
-      };
+        result.insert(element);
+      });
 
       if (isOptional) {
-        var delete_button = $('<a />', {
+        var delete_button = new Element('a', {
           'class': 'icon-move icon',
           href: 'javascript:void(0)'
-        }).append(this._('Remove'));
+        }).insert(this._('Remove'));
 
         t = this;
 
-        delete_button.on('click', function(event){
+        Event.observe(delete_button, 'click', function(event){
           var optional_field = Event.element(event).up().select('.optional').first();
           t.hide_optional_field(optional_field);
           t.sort_select(optional_field.up(1).select('select.optional_fields').first());
         });
 
-        result.append(delete_button);
+
+        result.insert(delete_button);
       }
+
       return result;
     },
 
@@ -728,12 +710,7 @@ $(document).ready(function() {
   /**
    * Translator
    */
-  // var Translator = Class.create({
-  Translator = function() {
-    this.initialize();
-  }
-  
-  $.extend(Translator.prototype, {
+  var Translator = Class.create({
     /**
      * Constructor.
      * Initialize translator
@@ -742,8 +719,8 @@ $(document).ready(function() {
      *
      * @return void
      */
-    initialize: function() {
-      this.i18n_strings = new HashTable(IssueHotButtonsSettings.i18n_strings);
+    initialize: function(i18n_strings) {
+      this.i18n_strings = new Hash(i18n_strings);
     },
 
     /**
@@ -756,22 +733,16 @@ $(document).ready(function() {
      */
     get: function(key, get_back) {
       get_back = get_back === false ? false : true;
-      if ($.isArray(key)) key = key.join('_');
-      return this.i18n_strings.items[key] || (get_back ? key : false);
+      if (Object.isArray(key)) key = key.join('_');
+      return this.i18n_strings.get(key) || (get_back ? key : false);
     }
   });
 
   /**
    * Settings page
    */
-  //var Settings = Class.create(IssueHotButtonsSettings, {
-  Settings = function() {
-      this.initialize();
-  }
+  var Settings = Class.create(IssueHotButtonsSettings, {
 
-  $.extend(Settings.prototype, IssueHotButtonsSettings);
-
-  $.extend(Settings.prototype, {
     /**
      * Available Hot Buttons
      */
@@ -791,7 +762,7 @@ $(document).ready(function() {
     initialize: function() {
       this.buttons_factory = new ButtonSettingsFactory();
 
-      this.translator = this.buttons_factory.translator = new Translator();
+      this.translator = this.buttons_factory.translator = new Translator(this.i18n_strings);
 
       // Assign custom fields to ButtonSettingsFactory
       this.buttons_factory.issue_custom_fields = this.issue_custom_fields;
@@ -807,7 +778,7 @@ $(document).ready(function() {
       this.modify_form_controls();
       this.load_saved_buttons();
 
-      $('input[name="commit"]').first().on('click', this.attach_input_names);
+      $$P('input[name="commit"]').first().observe('click', this.attach_input_names);
     },
 
     /**
@@ -816,29 +787,21 @@ $(document).ready(function() {
      * @return void
      */
     load_saved_buttons: function() {
-      if (ObjectIsUndefined(this.settings)) return false;
+      if (Object.isUndefined(this.settings)) return false;
 
       // Create buttons list, if not exists
-      if ($('#buttons_list') == null) {
-        $('hot_buttons_settings').append($('<ul />', {id: 'buttons_list'}));
+      if ($P('buttons_list') == null) {
+        $P('hot_buttons_settings').appendChild(new Element('ul', {id: 'buttons_list'}));
       }
 
       var t = this;
-/*
-      for (button_config in new HashTable(this.settings).values()) {
-        var button_config = new HashTable(button_config);
+      new Hash(this.settings).values().each(function(button_config){
+        var button_config = new Hash(button_config);
         var name = button_config.keys().first();
         var params = button_config.values().first();
 
         var button = t.render_button(name, params, true);
-        $('#buttons_list').append(button);
-        t.hide_optional_fields(button);
-      };
-*/
-    var ht = new HashTable(this.settings);
-    ht.each( function(name, button_config) {
-        var button = t.render_button(name, button_config, true);
-        $('#buttons_list').append(button);
+        $P('buttons_list').insert(button);
         t.hide_optional_fields(button);
       });
       this.init_sortable_list();
@@ -850,10 +813,12 @@ $(document).ready(function() {
      * @return void
      */
     init_sortable_list: function() {
-//      Sortable.create('buttons_list', {
-//        tag:'li',
-//        onChange: function(){}
-//      });
+/*      Sortable.create('buttons_list', {
+        tag:'li',
+        onChange: function(){}
+      });
+	  */
+	  jQuery('#buttons_list').sortable().disableSelection();
     },
 
     /**
@@ -865,11 +830,10 @@ $(document).ready(function() {
      */
     attach_input_names: function() {
       var button_number = 0;
-      //$$('li.hot_button').each(function(li){
-      for (li in $('#li.hot_button')) {
+      $$P('li.hot_button').each(function(li){
         var collapsed = li.hasClassName('collapsed');
         if (collapsed) {
-          li.removeClass('collapsed');
+          li.removeClassName('collapsed');
         }
 
         var button_type = li.classNames().toArray().pop();
@@ -899,10 +863,10 @@ $(document).ready(function() {
         });
 
         if (collapsed) {
-          li.addClass('collapsed');
+          li.addClassName('collapsed');
         }
         button_number++;
-      };
+      });
     },
 
     /**
@@ -913,79 +877,79 @@ $(document).ready(function() {
     render_selector: function() {
       var t = this;
 
-      var wrapper = $('<div>', {id: 'hot_buttons_selector_wrapper'});
+      var wrapper = new Element('div', {id: 'hot_buttons_selector_wrapper'});
 
-      var label = $('<label>', {'for': 'hot_buttons_selector'});
-//        .appendTo(this._('select_hot_button'));
-      wrapper.append(label);
+      var label = new Element('label', {'for': 'hot_buttons_selector'})
+        .insert(this._('select_hot_button'));
+      wrapper.insert(label);
 
-      var select = $('<select>', {id: 'hot_buttons_selector'});
+      var select = new Element('select', {id: 'hot_buttons_selector'});
       var buttons = this.available_buttons;
-      buttons.unshift("");
-      buttons.foreach(function(button_id,button_val) {
-        select.append($('<option>', { value: button_val }).text(t._(button_val)));
+      buttons.unshift(false);
+      buttons.each(function(button_id){
+        var option = new Element('option', {
+          value: button_id
+        }).insert(t._(button_id));
+        select.appendChild(option);
       });
-      wrapper.append(select);
+      wrapper.appendChild(select);
 
-      var collapse_button = $('<a>',{
+      var collapse_button = new Element('a',{
         'href': 'javascript:void(0)',
         'class': 'icon icon-folder'
       })
-        .text(this._('collapse_all'))
-        .on('click', function(){
-          $('#buttons_list li.hot_button').foreach(function(id,hot_button){
-          // for (hot_button in $('#buttons_list li.hot_button')) {
+        .update(this._('collapse_all'))
+        .observe('click', function(){
+          $$P('#buttons_list li.hot_button').each(function(hot_button){
             hot_button.hasClassName('collapsed')
               ? false
-              : hot_button.addClass('collapsed');
+              : hot_button.addClassName('collapsed');
           });
         });
-      var expand_button = $('<a>',{
+      var expand_button = new Element('a',{
         'href': 'javascript:void(0)',
         'class': 'icon open icon-folder'
       })
-      .text(this._('expand_all'))
-        //.update('expand_all')
-        .on('click', function(){
-          $('#buttons_list li.hot_button').each(function(hot_button){
-            hot_button.removeClass('collapsed');
+        .update(this._('expand_all'))
+        .observe('click', function(){
+          $$P('#buttons_list li.hot_button').each(function(hot_button){
+            hot_button.removeClassName('collapsed');
           });
         })
         .wrap('span', {'class': 'open'});
-      var collapse_controls = $('<div>', {'class': 'collapse_expand'})
-        .append(collapse_button)
-        .append(expand_button);
-      wrapper.append(collapse_controls);
+      var collapse_controls = new Element('div', {'class': 'collapse_expand'})
+        .insert(collapse_button)
+        .insert(expand_button);
+      wrapper.insert(collapse_controls);
 
-      select.on('change', function(event) {
-	    var button_name = event.target.value;
-        // wrong: var button_name = $('#hot_buttons_selector').val();
+      Event.observe(select, 'change', function(){
+        var button_name = $P('hot_buttons_selector').value;
         if (button_name.length == 0) return false;
 
-        $('#hot_buttons_selector option').first().selected = true;
+        $$P('#hot_buttons_selector option').first().selected = true;
 
         var button = t.render_button(button_name, false, false, 'top');
-        $('#buttons_list').append(button);
+        $P('buttons_list').insert({'top': button});
         t.hide_optional_fields(button);
         var edit_name = button.select('.edit_internal_name').first();
         edit_name.click(edit_name.fire('click'));
         t.init_sortable_list();
       });
 
-      $('#hot_buttons_settings').append(wrapper);
+      $P('hot_buttons_settings').appendChild(wrapper);
     },
     
     modify_form_controls: function() {
-      var save_button = $('input[name="commit"]').first();
-      save_button.value = 'Save'; //this._('save');
-      var cancel_button = $('input', {
+      var save_button = $$P('input[name="commit"]').first();
+      save_button.value = this._('save');
+      var cancel_button = new Element('input', {
         type: 'button',
-        value: 'Cancel'
+        value: this._('cancel')
       })
-        .on('click', function(e){
+        .observe('click', function(e){
           window.location.reload();
         });
-      save_button.append(cancel_button);
+      save_button.insert({after: cancel_button});
     },
 
     /**
@@ -998,13 +962,13 @@ $(document).ready(function() {
 
       var button = this.buttons_factory.get(button_name, params)
       if (button && collapsed) {
-        button.addClass('collapsed');
+        button.addClassName('collapsed');
       }
       if (! button) return;
       
       button.select('.clone_hot_button')
         .first()
-        .on('click', function(event){
+        .observe('click', function(event){
           t.clone_button(event, t);
         });
       
@@ -1017,7 +981,7 @@ $(document).ready(function() {
     clone_button: function(event, t) {
       t.attach_input_names();
       var source = event.element().up(1);
-      source.hasClassName('collapsed') || source.addClass('collapsed');
+      source.hasClassName('collapsed') || source.addClassName('collapsed');
       var clone_type = source.classNames().toArray()[1];
       var clone_config = {};
       source.select('input').each(function(input){
@@ -1035,7 +999,7 @@ $(document).ready(function() {
       var rename_link = clone.select('a.edit_internal_name').first();
       
       t.hide_optional_fields(clone);
-      source.append({after: clone});
+      source.insert({after: clone});
       rename_link.click(rename_link.fire('click'));
       t.init_sortable_list();
     },
@@ -1043,10 +1007,10 @@ $(document).ready(function() {
     hide_optional_fields: function(button) {
       if (! button) return;
       t = this;
-      button.select('.optional.no_value').each(function(name,field){
+      button.select('.optional.no_value').each(function(field){
         t.hide_optional_field(field)
       });
-      button.select('select.optional_fields').each(function(id,select){
+      button.select('select.optional_fields').each(function(select){
         t.sort_select(select);
       });
     },
@@ -1063,15 +1027,14 @@ $(document).ready(function() {
         option.remove();
       });
       labels.each(function(label){
-        select.append(options[label]);
+        select.insert(options[label]);
       });
       select.value = 0;
     },
     
     hide_optional_field: function(field){
       t = this;
-      return;
-	  
+
       var label_text = field.siblings().first().innerHTML;
       var element_name = field.classNames().toArray().first();
 
@@ -1080,9 +1043,9 @@ $(document).ready(function() {
 
       var optional_fields_select = null;
       if (! field_container.select('select.optional_fields').length) {
-        optional_fields_select = $('<select />', {
+        optional_fields_select = new Element('select', {
           'class': 'optional_fields'
-        }).append($('<option />'));
+        }).insert(new Element('option'));
 
         Event.observe(optional_fields_select, 'change', function(event){
           var optional_select = Event.element(event);
@@ -1101,17 +1064,17 @@ $(document).ready(function() {
           }
         });
 
-        field_container.append({
-          top: $('<div>', {'class': 'optional_elements_selector'})
-            .append($('<label>').update(this._('select_hidden_elements')))
-            .append(optional_fields_select)
+        field_container.insert({
+          top: new Element('div', {'class': 'optional_elements_selector'})
+            .insert(new Element('label').update(this._('select_hidden_elements')))
+            .insert(optional_fields_select)
         })
       }
       else {
         optional_fields_select = field_container.select('select.optional_fields').first();
       }
-      optional_fields_select.append(
-        $('<option>', {value: element_name}).update(label_text)
+      optional_fields_select.insert(
+        new Element('option', {value: element_name}).update(label_text)
       );
       optional_fields_select.up().show();  
 
@@ -1128,11 +1091,10 @@ $(document).ready(function() {
      * @return Translated string for current language
      */
     _: function(key, get_back) {
-      //return key;
       return this.translator.get(key, get_back);
     }
   });
 
   // Initialize settings page!
-  var s = new Settings();
+  new Settings();
 });

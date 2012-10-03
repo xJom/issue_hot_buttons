@@ -11,6 +11,7 @@
   locale = I18n.locale
 %>
 <% content_for :header_tags do %>
+  <%= javascript_include_tag 'prototype.js', :plugin => 'issue_hot_buttons_plugin' %>
   <%= javascript_include_tag 'hot_buttons.js', :plugin => 'issue_hot_buttons_plugin' %>
   <%= stylesheet_link_tag 'hot_buttons.css', :plugin => 'issue_hot_buttons_plugin' %>
   <script type="text/javascript">

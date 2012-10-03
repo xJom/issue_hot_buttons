@@ -2,7 +2,7 @@
  * Redmine Issue Hot Buttons plugin
  * Issue page
  */
-document.observe('dom:loaded', function(){
+jQuery(document).ready(function() {
 
   /**
    * Parent object for all hot buttons
@@ -131,7 +131,7 @@ document.observe('dom:loaded', function(){
      * @return void
      */
     hide_optional: function(event) {
-      $('issue_hot_buttons').select('button').each(function(btn){
+      $P('issue_hot_buttons').select('button').each(function(btn){
         btn.removeAttribute('disabled');
         btn.setStyle({opacity: 1});
       });
@@ -140,7 +140,7 @@ document.observe('dom:loaded', function(){
         element.up(1).remove();
       }
       else {
-        $('issue_hot_buttons_additional').remove();
+        $P('issue_hot_buttons_additional').remove();
       }
     },
 
@@ -154,7 +154,7 @@ document.observe('dom:loaded', function(){
     get_mirrored_element: function(element_id) {
       var tmp_id = [element_id, Math.round(Math.random() * 10000000)].join('_');
 
-      var original_element = $(element_id);
+      var original_element = $P(element_id);
       if (! original_element) return false;
 
       var mirrored_element = original_element.up().clone(true);
@@ -308,11 +308,11 @@ document.observe('dom:loaded', function(){
               }
             });
             configures_users = configures_users.uniq();
-            if (configures_users.length && $('issue_assigned_to_id')) {
+            if (configures_users.length && $P('issue_assigned_to_id')) {
               configures_users.each(function(user_id){
                 user_id = user_id ? user_id : '';
                 suitable = suitable
-                  && $$('#issue_assigned_to_id option[value="' + user_id + '"]').length > 0;
+                  && $$P('#issue_assigned_to_id option[value="' + user_id + '"]').length > 0;
               });
             }
             else {
@@ -323,7 +323,7 @@ document.observe('dom:loaded', function(){
           case 'set_issue_status':
             var set_issue_status = t.config.get('set_issue_status').evalJSON().first();
             var available_statuses = [];
-            $$('#issue_status_id option').each(function(option){
+            $$P('#issue_status_id option').each(function(option){
               available_statuses.push(option.value);
             });
             suitable = suitable && -1 < available_statuses.indexOf(set_issue_status);
@@ -332,7 +332,7 @@ document.observe('dom:loaded', function(){
           case 'include_standart_fields':
             var default_fields = t.config.get('include_standart_fields').evalJSON();
             default_fields.each(function(field_id){
-              var default_field = $(field_id);
+              var default_field = $P(field_id);
               suitable = suitable &&
                 (default_field && ! default_field.disabled);
             });
@@ -342,7 +342,7 @@ document.observe('dom:loaded', function(){
             var custom_fields = t.config.get('include_custom_fields').evalJSON();
             custom_fields.each(function(field_num){
               var field_id = ['issue_custom_field_values', field_num].join('_');
-              var custom_field = $(field_id);
+              var custom_field = $P(field_id);
               suitable = suitable &&
                 (custom_field && ! custom_field.disabled);
             });
@@ -422,9 +422,9 @@ document.observe('dom:loaded', function(){
         href: 'javascript:void(0)'
       });
       Event.observe(close_button, 'click', function(e) {
-        if ($$('#issue_hot_buttons_additional #attachments_fields').length > 0) {
-          $$('#issue-form .box fieldset').last().insert(
-            $('attachments_fields').up()
+        if ($$P('#issue_hot_buttons_additional #attachments_fields').length > 0) {
+          $$P('#issue-form .box fieldset').last().insert(
+            $P('attachments_fields').up()
           );
         }
         t.hide_optional(e);
@@ -436,7 +436,7 @@ document.observe('dom:loaded', function(){
       })
         .insert(new Element('div', {'class': 'controls'}).insert(close_button))
         .insert(additional_wrapper);
-      $('issue_hot_buttons').insert({after: additional_container});
+      $P('issue_hot_buttons').insert({after: additional_container});
       
       additional_container
         .select('textarea, input, select')
@@ -555,10 +555,10 @@ document.observe('dom:loaded', function(){
                 ? user_to_reassign.toString()
                 : '';
               
-              $('issue_assigned_to_id').value = user_to_reassign;
+              $P('issue_assigned_to_id').value = user_to_reassign;
             }
             else {
-              $('issue_assigned_to_id').value =
+              $P('issue_assigned_to_id').value =
                 button.up().select('select.issue_assigned_to_id').first().value;
             }
             break;
@@ -566,19 +566,19 @@ document.observe('dom:loaded', function(){
           case 'set_done':
             var set_done = button.config.get('set_done').evalJSON();
             if (set_done) {
-              $('issue_done_ratio').value = 100;
+              $P('issue_done_ratio').value = 100;
             }
             break;
             
           case 'set_issue_status':
             var issue_status = button.config.get('set_issue_status').evalJSON();
-            $('issue_status_id').value = issue_status.first();
+            $P('issue_status_id').value = issue_status.first();
             break;
 
           case 'include_comment':
             var include_comment = button.config.get('include_comment').evalJSON();
             if (include_comment) {
-              $('notes').value = button.up().select('textarea.notes').first().value;
+              $P('notes').value = button.up().select('textarea.notes').first().value;
             }
             break;
 
@@ -586,7 +586,7 @@ document.observe('dom:loaded', function(){
             var custom_fields = button.config.get('include_custom_fields').evalJSON();
             custom_fields.each(function(id) {
               var custom_field_id = ['issue_custom_field_values', id].join('_');
-              var original_field = $(custom_field_id);
+              var original_field = $P(custom_field_id);
               var mirrored_field = button.up().select('.' + custom_field_id).first();
               if (mirrored_field && original_field) {
                 original_field.value = mirrored_field.value;
@@ -597,7 +597,7 @@ document.observe('dom:loaded', function(){
           case 'include_standart_fields':
             var standart_fields = button.config.get('include_standart_fields').evalJSON();
             standart_fields.each(function(standart_field_id) {
-              var original_field = $(standart_field_id);
+              var original_field = $P(standart_field_id);
               var mirrored_field = button.up().select('.' + standart_field_id).first();
               if (mirrored_field && original_field) {
                 original_field.value = mirrored_field.value;
@@ -606,15 +606,15 @@ document.observe('dom:loaded', function(){
             break;
             
           case 'include_file_attachment':
-            $$('#issue-form .box fieldset').last().insert(
-              $('attachments_fields').up()
+            $$P('#issue-form .box fieldset').last().insert(
+              $P('attachments_fields').up()
             );
             break;
         }
       });
       
       // Submit issue form!
-      $('issue-form').submit();
+      $P('issue-form').submit();
     }
 
   });
@@ -661,7 +661,7 @@ document.observe('dom:loaded', function(){
           case 'activity':
             var activity = t.config.get('activity').evalJSON().first();
             var available_activities = [];
-            $$('#time_entry_activity_id option').each(function(option){
+            $$P('#time_entry_activity_id option').each(function(option){
               option.value && available_activities.push(option.value);
             });
             suitable = suitable && -1 < available_activities.indexOf(activity);
@@ -672,7 +672,7 @@ document.observe('dom:loaded', function(){
             custom_fields.each(function(custom_field_num){
               var custom_field_id =
                 ['time_entry_custom_field_values', custom_field_num].join('_');
-              var custom_field = $(custom_field_id);
+              var custom_field = $P(custom_field_id);
               suitable = suitable &&
                 (custom_field && ! custom_field.disabled)
             });
@@ -798,7 +798,7 @@ document.observe('dom:loaded', function(){
         .insert(new Element('div', {'class': 'controls'}).insert(close_button))
         .insert(additional_wrapper);
 
-      $('issue_hot_buttons').insert({after: additional_container});
+      $P('issue_hot_buttons').insert({after: additional_container});
     },
     
     /**
@@ -948,7 +948,7 @@ document.observe('dom:loaded', function(){
         'time_entry[issue_id]': t.issue.issue.id,
         'time_entry[spent_on]': t.today,
         'time_entry[hours]': working_hours,
-        'authenticity_token': $$('input[name="authenticity_token"]').first().value
+        'authenticity_token': $$P('input[name="authenticity_token"]').first().value
       };
       
       var request_url = ['/projects', t.project.project.identifier, 'timelog/create'].join('/');
@@ -978,7 +978,7 @@ document.observe('dom:loaded', function(){
           case 'include_custom_fields':
             var custom_fields = t.config.get('include_custom_fields').evalJSON();
             custom_fields.each(function(id){
-              var original_input = $$('#time_entry_custom_field_values_' + id).last();
+              var original_input = $$P('#time_entry_custom_field_values_' + id).last();
               post_data['time_entry[custom_field_values][' + id + ']'] =
                 original_input.value;
               var mirrored_input = button.up(1).select('.time_entry_custom_field_values_' + id).last();
@@ -1124,9 +1124,8 @@ document.observe('dom:loaded', function(){
         buttons.each(function(element){
           hot_buttons_container.insert(element);
         });
-        $$('div.issue').first().insert({before: hot_buttons_container});
+        $$P('div.issue').first().insert({before: hot_buttons_container});
       }
-
     }
 
   });
