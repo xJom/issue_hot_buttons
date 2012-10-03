@@ -578,8 +578,8 @@ $(document).ready(function() {
       var input_element = null;
       var no_label = false;
 
-      var isOptional = service_params.get('_optional');
-      var callback  = service_params.get('_callback');
+      var isOptional = service_params['_optional'];
+      var callback  = service_params['_callback'];
       
       switch (input_type) {
         case 'hidden':
