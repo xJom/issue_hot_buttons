@@ -6,8 +6,11 @@
   margin-bottom: 4px;
 }
 
-#issue_hot_buttons  .a {
-    background-image: url(../images/lightning.png);
+#issue_hot_buttons a.icon {
+	cursor: pointer;
+    background-image: url(../lightning.png);
+    color: rgb(255,255,255);
+	background-color: rgb(98,141,182);
 }
 
 #issue_hot_buttons button.action {
