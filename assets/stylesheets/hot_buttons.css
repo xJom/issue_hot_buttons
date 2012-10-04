@@ -2,11 +2,17 @@
  * Redmine Issue Hot Buttons plugin
  */
 #issue_hot_buttons {
+  text-align:right;
   margin-bottom: 4px;
 }
-  #issue_hot_buttons button.action {
+
+#issue_hot_buttons  .a {
+    background-image: url(/images/lightning.png);
+}
+
+#issue_hot_buttons button.action {
     margin-right: 3px;
-  }
+}
 
 #issue_hot_buttons_additional {
   border: 1px solid #D7D7D7;
