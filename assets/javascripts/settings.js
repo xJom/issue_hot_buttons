@@ -20,7 +20,7 @@ jQuery(document).ready(function() {
       return {
         enabled: ['hidden', 1],
         internal_name: ['hidden', ''],
-        caption: 'text',
+        caption: ['hidden', ''], //'text',
         _callback: {
           caption: {
             focus: this.callback.save_value,
@@ -39,7 +39,7 @@ jQuery(document).ready(function() {
       return {
         enabled: ['hidden', 1],
         internal_name: ['hidden', ''],
-        caption: 'text',
+        caption: ['hidden', ''], //'text',
         _callback: {
           caption: {
             focus: this.callback.save_value,
@@ -114,7 +114,7 @@ jQuery(document).ready(function() {
       return {
         enabled: ['hidden', 1],
         internal_name: ['hidden', ''],
-        caption: 'text',
+        caption: ['hidden', ''],
         actions: {
           set_issue_status: ['select', false, this.issue_statuses],
           assign_to_other: ['multiselect', false, users_roles],
@@ -310,7 +310,8 @@ jQuery(document).ready(function() {
         return this.wrap_button(
           button_name,
           this.render_form(button_name, button_frame, params),
-          config_section_name || this._(button_name)
+          config_section_name || this._(button_name),
+		  params['caption'] || this._(button_name)
         );
       }
       return false;
@@ -326,7 +327,7 @@ jQuery(document).ready(function() {
      *
      * @return Complete Hot Button settings section
      */
-    wrap_button: function(button_name, button, config_section_name) {
+    wrap_button: function(button_name, button, config_section_name, button_caption) {
       var t = this;
 
       var delete_button = new Element('a', {
@@ -341,8 +342,8 @@ jQuery(document).ready(function() {
       var config_section_title = new Element('a',{
         'class': 'collapse_section internal_name',
         href: 'javascript:void(0)'
-      })
-        .update(config_section_name);
+      }).update(button_caption);
+      //  .update(config_section_name);
 
       Event.observe(config_section_title, 'click', function(event){
         var config_section = Event.element(event).up('.hot_button');
@@ -357,7 +358,7 @@ jQuery(document).ready(function() {
       var internal_name_input = new Element('input', {
         type: 'text',
         'class': 'internal_name',
-        value: config_section_name
+        value: button_caption //config_section_name
       }).hide();
       
       var save_internal_name_callback = function(event){
@@ -376,7 +377,8 @@ jQuery(document).ready(function() {
         var internal_name_value = name_input.value.strip();
         name_link.update(internal_name_value);
 
-        button_save.up(1).select('input[xname="internal_name"]')
+        //button_save.up(1).select('input[xname="internal_name"]')
+        button_save.up(1).select('input[xname="caption"]')
           .first()
           .value = internal_name_value;
       };

@@ -361,7 +361,8 @@ jQuery(document).ready(function() {
     render_button: function() {
       var t = this;
       
-      var button = new Element('button', {'class': 'action'})
+      //var button = new Element('button', {'class': 'action'})
+      var button = new Element('a', {'class': 'collapse_section'})
         .insert(this.config.get('caption'));
       button.config = this.config;
 
