@@ -8,7 +8,7 @@
 
 #issue_hot_buttons a.icon {
 	cursor: pointer;
-    background-image: url(../lightning.png);
+    background-image: url(../images/lightning.png);
     color: rgb(255,255,255);
 	background-color: rgb(98,141,182);
 }
