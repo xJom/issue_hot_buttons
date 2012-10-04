@@ -7,10 +7,12 @@
 }
 
 #issue_hot_buttons a.icon {
-	cursor: pointer;
-    background-image: url(../images/lightning.png);
+    cursor: pointer;
+    background-image: url(../images/lightning.png), url(../../../images/lightning.png);
     color: rgb(255,255,255);
-	background-color: rgb(98,141,182);
+    background-color: rgb(98,141,182);
+    padding-left: 28px;
+    padding-right: 8px;
 }
 
 #issue_hot_buttons button.action {
