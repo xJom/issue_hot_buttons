@@ -1121,7 +1121,7 @@ jQuery(document).ready(function() {
 
       if (0 < buttons.length) {
         // attach hot buttons, if exists
-        var hot_buttons_container = new Element('div', {'id': 'issue_hot_buttons'});
+        var hot_buttons_container = new Element('div', {'id': 'issue_hot_buttons', 'class':'contextual'});
         buttons.each(function(element){
           hot_buttons_container.insert(element);
         });
