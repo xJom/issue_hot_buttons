@@ -18,8 +18,8 @@ class Hooks < Redmine::Hook::ViewListener
     :layout => false
 end
 
-Redmine::Plugin.register :issue_hot_buttons_plugin do
-  name 'Issue Hot Buttons Plugin plugin'
+Redmine::Plugin.register :issue_hot_buttons do
+  name 'Issue Hot Buttons'
   author 'Mike Kolganov, Thumbtack Inc.'
   description 'Plugin for Redmine that add buttons for often used actions to issue page'
   version '0.4.4'

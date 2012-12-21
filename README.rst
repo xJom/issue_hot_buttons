@@ -17,7 +17,7 @@ Install
 -------
 
 1. `Download <https://github.com/thumbtack-technology/redmine-issue-hot-buttons/downloads>`_ plugin
-2. Extract to your Redmine into vendor/plugins/issue_hot_buttons_plugin
+2. Extract to your Redmine into vendor/plugins/issue_hot_buttons
 3. Restart web server
 
 Author
