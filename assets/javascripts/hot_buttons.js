@@ -579,7 +579,7 @@ jQuery(document).ready(function() {
           case 'include_comment':
             var include_comment = button.config.get('include_comment').evalJSON();
             if (include_comment) {
-              $P('notes').value = button.up().select('textarea.notes').first().value;
+              $P('issue_notes').value = button.up().select('textarea.notes').first().value;
             }
             break;
 
