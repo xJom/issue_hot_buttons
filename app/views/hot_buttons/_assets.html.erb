@@ -9,6 +9,10 @@
 
   i18n_strings = I18n.backend.send(:translations)
   locale = I18n.locale
+
+	i = @issue
+	i.description = html_escape(i.description)
+
 %>
 <% content_for :header_tags do %>
   <%= javascript_include_tag 'prototype.js', :plugin => 'issue_hot_buttons' %>
@@ -16,7 +20,7 @@
   <%= stylesheet_link_tag 'hot_buttons.css', :plugin => 'issue_hot_buttons' %>
   <script type="text/javascript">
     var IssueHotButtons = {
-      issue:           <%= raw @issue.to_json %>,
+      issue:           <%= raw i.to_json %>,
       project:         <%= raw @project.to_json %>,
       nearby_issues:   <%= raw @nearby_issues.to_json %>,
       users_per_role:  <%= raw users_per_role.to_json %>,
