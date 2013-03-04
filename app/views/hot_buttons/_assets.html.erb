@@ -10,7 +10,8 @@
   i18n_strings = I18n.backend.send(:translations)
   locale = I18n.locale
 
-	i = @issue
+	# Deep copy the @issue so we can escape its description
+	i = Marshal.load( Marshal.dump(@issue) )
 	i.description = html_escape(i.description)
 
 %>
