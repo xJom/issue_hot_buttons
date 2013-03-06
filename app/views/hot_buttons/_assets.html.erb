@@ -11,7 +11,7 @@
   locale = I18n.locale
 
 	# Deep copy the @issue so we can escape its description
-	i = Marshal.load( Marshal.dump(@issue) )
+ 	i = Marshal::load(Marshal.dump(@issue))
 	i.description = html_escape(i.description)
 
 %>
