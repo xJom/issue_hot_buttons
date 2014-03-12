@@ -17,7 +17,7 @@
   <%= stylesheet_link_tag 'hot_buttons.css', :plugin => 'issue_hot_buttons' %>
   <script type="text/javascript">
     var IssueHotButtons = {
-      issue:           <%= sanitize @issue.to_json %>,
+      issue:           <%= raw @issue.to_json tags: %w(table tr td), attributes: %w(id class style)%>,
       project:         <%= raw @project.to_json %>,
       nearby_issues:   <%= raw @nearby_issues.to_json %>,
       users_per_role:  <%= raw users_per_role.to_json %>,
