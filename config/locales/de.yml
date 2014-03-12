@@ -47,7 +47,7 @@ de:
     time_tracker_timer_in_title_label: "Show timer in page title"
 
     issue_update: "Update issue"
-    issue_update_description: "<strong>Tickets ändern</strong>: Anpassbarer Knopf zum schnellen &Auml;ndern von Tickets"
+    issue_update_description: "<strong>Tickets &auml;ndern</strong>: Anpassbarer Knopf zum schnellen &Auml;ndern von Tickets"
     issue_update_caption_label: "Button title"
     issue_update_caption_value: "Update issue"
     issue_update_conditions_subset: "Conditions"
