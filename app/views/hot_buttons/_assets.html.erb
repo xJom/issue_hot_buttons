@@ -9,6 +9,9 @@
 
   i18n_strings = I18n.backend.send(:translations)
   locale = I18n.locale
+  
+  #escaping issue description as script tags were breaking rendering
+  @issue.description = html_escape(@issue.description)
 
 %>
 <% content_for :header_tags do %>
