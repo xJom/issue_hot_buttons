@@ -11,7 +11,8 @@
   locale = I18n.locale
   
   #escaping issue description as script tags were breaking rendering
-  @issue.description = html_escape(@issue.description)
+  @issue_copy = @issue.clone
+  @issue_copy.description = @issue_copy.description.gsub(/[><]/, { '>' => '&gt;', '<' => '&lt;' })
 
 %>
 <% content_for :header_tags do %>
@@ -20,7 +21,7 @@
   <%= stylesheet_link_tag 'hot_buttons.css', :plugin => 'issue_hot_buttons' %>
   <script type="text/javascript">
     var IssueHotButtons = {
-      issue:           <%= raw @issue.to_json tags: %w(table tr td), attributes: %w(id class style)%>,
+      issue:           <%= raw @issue_copy.to_json tags: %w(table tr td), attributes: %w(id class style)%>,
       project:         <%= raw @project.to_json %>,
       nearby_issues:   <%= raw @nearby_issues.to_json %>,
       users_per_role:  <%= raw users_per_role.to_json %>,
