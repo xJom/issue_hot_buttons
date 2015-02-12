@@ -11,8 +11,8 @@
   locale = I18n.locale
   
   #escaping issue description as script tags were breaking rendering
-  @issue_copy = @issue.clone
-  @issue_copy.description = @issue_copy.description.gsub(/[><]/, { '>' => '&gt;', '<' => '&lt;' })
+  @issue_copy = @issue.dup
+  @issue_copy.description.gsub!(/[><]/, { '>' => '&gt;', '<' => '&lt;' })
 
 %>
 <% content_for :header_tags do %>
