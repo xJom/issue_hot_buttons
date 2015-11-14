@@ -747,12 +747,11 @@ jQuery(document).ready(function() {
 
     /**
      * Available Hot Buttons
+     * next_issue and prev_issue buttons disabled, since they are built-in for Redmine now
      */
     available_buttons: [
       'time_tracker',
-      'issue_update',
-      'next_issue',
-      'prev_issue'
+      'issue_update'
     ],
 
     /**
@@ -820,7 +819,7 @@ jQuery(document).ready(function() {
         onChange: function(){}
       });
 	  */
-	  jQuery('#buttons_list').sortable().disableSelection();
+ 	  jQuery('#buttons_list').sortable().disableSelection(); 
     },
 
     /**
@@ -836,6 +835,10 @@ jQuery(document).ready(function() {
         var collapsed = li.hasClassName('collapsed');
         if (collapsed) {
           li.removeClassName('collapsed');
+        }
+        var sortable = li.hasClassName('ui-sortable-handle')
+        if (sortable) {
+	        li.removeClassName('ui-sortable-handle');
         }
 
         var button_type = li.classNames().toArray().pop();
