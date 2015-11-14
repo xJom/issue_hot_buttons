@@ -306,12 +306,15 @@ jQuery(document).ready(function() {
         var config_section_name = !Object.isUndefined(params) &&
           ! Object.isUndefined(params.internal_name) &&
           params['internal_name'].strip();
+          
+        var caption = Object.isUndefined(button_frame['caption']) ? 
+        params['internal_name'] : params['caption'];
 
         return this.wrap_button(
           button_name,
           this.render_form(button_name, button_frame, params),
           config_section_name || this._(button_name),
-		  params['caption'] || this._(button_name)
+		  caption || this._(button_name)
         );
       }
       return false;
@@ -377,10 +380,14 @@ jQuery(document).ready(function() {
         var internal_name_value = name_input.value.strip();
         name_link.update(internal_name_value);
 
-        //button_save.up(1).select('input[xname="internal_name"]')
-        button_save.up(1).select('input[xname="caption"]')
+        button_save.up(1).select('input[xname="internal_name"]')
           .first()
           .value = internal_name_value;
+          
+        var caption_wrapper = button_save.up(1).select('input[xname="caption"]');
+        if (!Object.isUndefined(caption_wrapper)) {
+	        caption_wrapper.first().value = internal_name_value;
+        }
       };
       
       Event.observe(internal_name_input, 'blur', save_internal_name_callback);
@@ -751,7 +758,9 @@ jQuery(document).ready(function() {
      */
     available_buttons: [
       'time_tracker',
-      'issue_update'
+      'issue_update',
+      'next_issue',
+      'prev_issue'
     ],
 
     /**
