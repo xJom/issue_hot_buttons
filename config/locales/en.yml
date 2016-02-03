@@ -60,6 +60,7 @@ en:
     issue_update_include_comment_label: "Include comment"
     issue_update_set_comment_value_label: "Set comment default value"
     issue_update_include_file_attachment_label: "Include file attachments"
+    issue_update_add_time_entry_label: "Add time entry"
     
     next_issue: "Next issue"
     next_issue_description: "<strong>Next issue</strong>: Go to the next task, according to the current filter"

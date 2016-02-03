@@ -124,10 +124,11 @@ jQuery(document).ready(function() {
           include_comment: 'flag',
           set_comment_value: 'text',
           include_file_attachment: 'flag',
+          add_time_entry: 'flag',
           _optional: [
             'set_issue_status','assign_to_other', 'set_done', 
             'include_standart_fields', 'include_custom_fields', 'include_comment',
-            'set_comment_value', 'include_file_attachment'
+            'set_comment_value', 'include_file_attachment', 'add_time_entry'
           ],
           _callback: {
             assign_to_other: {

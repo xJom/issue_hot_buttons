@@ -17,6 +17,84 @@ jQuery(document).ready(function() {
     },
 
     /**
+     * Post Time Entry
+     *
+     * Post a time entry both from Stop Working and from separate action
+     *
+     * @param event Event object
+     * @param t     IssueUpdateButton context
+     */
+    post_time_entry: function(working_hours, the_activity, the_comment, t){
+      var post_data = {
+        'time_entry[issue_id]': t.issue.id,
+        'time_entry[spent_on]': t.today,
+        'time_entry[hours]': working_hours,
+        'time_entry[activity_id]' : the_activity,
+        'time_entry[comments]' : the_comment,
+        'authenticity_token': $$P('input[name="authenticity_token"]').first().value
+      };
+            
+      if (working_hours == 0){
+        var include_working_hours = t.config.get('hours').evalJSON();
+          if (include_comment) {
+            post_data['time_entry[hours]'] = 
+              button.up(1).select('input.time_entry_hours').first().value;
+          }
+        }
+
+      [
+        'activity',
+        'include_comment',
+        'include_custom_fields',
+      ].each(function(option){
+        if (! t.config.get(option)) return false;
+        switch(option) {
+          
+          case 'activity':
+            var activity = t.config.get('activity').evalJSON();
+            post_data['time_entry[activity_id]'] = 
+              button.up(1).select('select.time_entry_activity_id').first().value;
+            break;
+
+          case 'include_comment':
+            var include_comment = t.config.get('include_comment').evalJSON();
+            if (include_comment) {
+              post_data['time_entry[comments]'] = 
+                button.up(1).select('input.time_entry_comments').first().value;
+            }
+            break;
+
+          case 'include_custom_fields':
+            var custom_fields = t.config.get('include_custom_fields').evalJSON();
+            custom_fields.each(function(id){
+              var original_input = $$P('#time_entry_custom_field_values_' + id).last();
+              post_data['time_entry[custom_field_values][' + id + ']'] =
+                original_input.value;
+              var mirrored_input = button.up(1).select('.time_entry_custom_field_values_' + id).last();
+              if (mirrored_input.value) {
+                post_data['time_entry[custom_field_values][' + id + ']'] =
+                  mirrored_input.value;
+              }
+            }); /* each custom_field id */
+            break;
+        }
+      }); /* each function option */
+      var request_url = '/redmine/time_entries'; /* ['/projects', t.project.identifier, 'time_entries/new'].join('/'); */
+      new Ajax.Request(request_url, {
+        method: 'post',
+        asynchronous: false,
+        parameters: new Hash(post_data), /* How to transfer post_data here? */
+        onComplete: function(response) {
+          window.onbeforeunload = null;
+          window.location.href = window.location.href;
+/*          window.location.reload(false); */
+        }
+      }); /* Ajax Request */
+
+      return post_data;
+    },
+
+    /**
      * Translate string using IssueHotButtonsSettings locale strings store
      *
      * @param  key i18n identifier
@@ -217,7 +295,8 @@ jQuery(document).ready(function() {
       'include_standart_fields',
       'include_custom_fields',
       'include_comment',
-      'include_file_attachment'
+      'include_file_attachment',
+      'add_time_entry'
     ],
 
     /**
@@ -251,7 +330,8 @@ jQuery(document).ready(function() {
         'include_standart_fields',
         'include_custom_fields',
         'include_comment',
-        'include_file_attachment'
+        'include_file_attachment',
+        'add_time_entry'
       ].each(function(i){
         if (! Object.isUndefined(t.config.get(i))) {
           switch(i) {
@@ -267,6 +347,12 @@ jQuery(document).ready(function() {
             case 'include_comment':
               var include_comment = t.config.get('include_comment').evalJSON();
               if (include_comment) {
+                no_additional = no_additional && false;
+              }
+              break;
+            case 'add_time_entry':
+              var time_entry = t.config.get('add_time_entry').evalJSON();
+              if (time_entry) {
                 no_additional = no_additional && false;
               }
               break;
@@ -292,7 +378,8 @@ jQuery(document).ready(function() {
         'assign_to_other',
         'set_issue_status',
         'include_custom_fields',
-        'include_standart_fields'
+        'include_standart_fields',
+        'add_time_entry'
       ].each(function(option){
         var setting = t.config.get(option);
         if (! setting) return false;
@@ -522,6 +609,24 @@ jQuery(document).ready(function() {
             elements.push(file_attachment_block);
             break;
 
+          case 'add_time_entry':
+            var time_entry = button_config.get('add_time_entry').evalJSON();
+            if (time_entry) {
+              var time_element = new Element('p');
+              time_element.insert(new Element('label').update(t._('Spent hours')));
+              time_element.insert(new Element('textarea', {
+                'class': 'hours',
+                cols: 5,
+                rows: 1
+              }));
+              var time_default_value = button_config.get('add_time_entry');
+              if (time_default_value) {
+                time_element.select('textarea').first().value = time_default_value;
+              }
+              elements.push(time_element);
+            }
+            break;
+
         }
       });
       return elements;
@@ -543,7 +648,8 @@ jQuery(document).ready(function() {
         'include_standart_fields',
         'set_done',
         'set_issue_status',
-        'include_file_attachment'
+        'include_file_attachment',
+        'add_time_entry'
       ].each(function(option){
         if (! button.config.get(option)) return false;
         switch(option) {
@@ -610,6 +716,21 @@ jQuery(document).ready(function() {
             $$P('#issue-form .box fieldset').last().insert(
               $P('attachments_fields').up()
             );
+            break;
+          case 'add_time_entry':
+            var time_entry = button.config.get('add_time_entry').evalJSON();
+            var value = 0
+            var comment = ""
+            if (time_entry > 0) {
+              value = button.up().select('textarea.hours').first().value;
+            }
+            var include_comment = button.config.get('include_comment').evalJSON();
+            if (include_comment) {
+              comment = button.up().select('textarea.notes').first().value;
+            }
+            /* ugly - hardcoded - should be read out from activities */
+            var time_entry = AbstractHotButton.prototype.post_time_entry.call(this, value, '13', comment, t);
+
             break;
         }
       });
@@ -942,67 +1063,13 @@ jQuery(document).ready(function() {
       working_time += (module > 0)
         ? round_interval
         : 0;
-      
       var working_hours = (working_time / 60 / 60);
-      
-      var post_data = {
-        'time_entry[issue_id]': t.issue.id,
-        'time_entry[spent_on]': t.today,
-        'time_entry[hours]': working_hours,
-        'authenticity_token': $$P('input[name="authenticity_token"]').first().value
-      };
-      
-      var request_url = '/time_entries'; /* ['/projects', t.project.identifier, 'time_entries/new'].join('/'); */
-      
-      [
-        'activity',
-        'include_comment',
-        'include_custom_fields',
-      ].each(function(option){
-        if (! t.config.get(option)) return false;
-        switch(option) {
-          
-          case 'activity':
-            var activity = t.config.get('activity').evalJSON();
-            post_data['time_entry[activity_id]'] = 
-              button.up(1).select('select.time_entry_activity_id').first().value;
-            break;
-
-          case 'include_comment':
-            var include_comment = t.config.get('include_comment').evalJSON();
-            if (include_comment) {
-              post_data['time_entry[comments]'] = 
-                button.up(1).select('input.time_entry_comments').first().value;
-            }
-            break;
-
-          case 'include_custom_fields':
-            var custom_fields = t.config.get('include_custom_fields').evalJSON();
-            custom_fields.each(function(id){
-              var original_input = $$P('#time_entry_custom_field_values_' + id).last();
-              post_data['time_entry[custom_field_values][' + id + ']'] =
-                original_input.value;
-              var mirrored_input = button.up(1).select('.time_entry_custom_field_values_' + id).last();
-              if (mirrored_input.value) {
-                post_data['time_entry[custom_field_values][' + id + ']'] =
-                  mirrored_input.value;
-              }
-            });
-            break;
-        }
-      });
-     
+      var post_data = AbstractHotButton.prototype.post_time_entry.call(this, working_hours, 0, "", t);
       // Submit issue form!
-      new Ajax.Request(request_url, {
-        method: 'post',
-        parameters: new Hash(post_data),
-        onComplete: function(response) {
-          window.onbeforeunload = null;
-          window.location.href = window.location.href;
-        }
-      });
-    }
-  });
+      $P('issue-form').submit();
+    },
+   
+  }); /* Time Tracker Hot Button */
   
   var NextPrevIssueButton = Class.create(AbstractHotButton, {
     
