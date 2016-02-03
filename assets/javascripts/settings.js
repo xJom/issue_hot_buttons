@@ -828,7 +828,7 @@ jQuery(document).ready(function() {
         onChange: function(){}
       });
 	  */
- 	  jQuery('#buttons_list').sortable().disableSelection(); 
+ 	  jQuery('#buttons_list').sortable(); //.disableSelection(); 
     },
 
     /**
