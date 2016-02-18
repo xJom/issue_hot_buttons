@@ -24,7 +24,7 @@ jQuery(document).ready(function() {
      * @param event Event object
      * @param t     IssueUpdateButton context
      */
-    post_time_entry: function(working_hours, the_activity, the_comment, t){
+    post_time_entry: function(working_hours, the_activity, the_comment, t, button){
       var post_data = {
         'time_entry[issue_id]': t.issue.id,
         'time_entry[spent_on]': t.today,
@@ -729,7 +729,7 @@ jQuery(document).ready(function() {
               comment = button.up().select('textarea.notes').first().value;
             }
             /* ugly - hardcoded - should be read out from activities */
-            var time_entry = AbstractHotButton.prototype.post_time_entry.call(this, value, '13', comment, t);
+            var time_entry = AbstractHotButton.prototype.post_time_entry.call(this, value, '13', comment, t, button);
 
             break;
         }
@@ -1064,7 +1064,7 @@ jQuery(document).ready(function() {
         ? round_interval
         : 0;
       var working_hours = (working_time / 60 / 60);
-      var post_data = AbstractHotButton.prototype.post_time_entry.call(this, working_hours, 0, "", t);
+      var post_data = AbstractHotButton.prototype.post_time_entry.call(this, working_hours, 0, "", t, button);
       // Submit issue form!
       $P('issue-form').submit();
     },
