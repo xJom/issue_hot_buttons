@@ -51,16 +51,20 @@ jQuery(document).ready(function() {
         switch(option) {
           
           case 'activity':
-            var activity = t.config.get('activity').evalJSON();
-            post_data['time_entry[activity_id]'] = 
-              button.up(1).select('select.time_entry_activity_id').first().value;
+		    if (post_data['time_entry[activity_id]'] == "") {
+              var activity = t.config.get('activity').evalJSON();
+              post_data['time_entry[activity_id]'] = 
+                button.up(1).select('select.time_entry_activity_id').first().value;
+			}
             break;
 
           case 'include_comment':
-            var include_comment = t.config.get('include_comment').evalJSON();
-            if (include_comment) {
-              post_data['time_entry[comments]'] = 
-                button.up(1).select('input.time_entry_comments').first().value;
+		    if (post_data['time_entry[comments]'] == "") {
+				var include_comment = t.config.get('include_comment').evalJSON();
+                if (include_comment) {
+                  post_data['time_entry[comments]'] = 
+                    button.up(1).select('input.time_entry_comments').first().value;
+				}
             }
             break;
 
